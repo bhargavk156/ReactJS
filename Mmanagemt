@@ -1,0 +1,1157 @@
+src/app/
+├── dashboard/
+│   ├── dashboard.component.ts
+│   ├── dashboard.component.html
+│   └── dashboard.component.scss
+│
+├── property/
+│   ├── property-list/
+│   └── property-details/
+│
+├── gold/
+│   ├── gold-list/
+│   └── gold-details/
+│
+├── cash/
+│   ├── cash-list/
+│   └── cash-details/
+│
+├── models/
+│   └── asset.model.ts
+│
+├── services/
+│   └── asset.service.ts
+│
+└── app.routes.ts
+=========================================================================================
+# Dashboard
+ng g c features/dashboard --style=scss
+
+# Properties
+ng g c features/properties/property-list --style=scss
+ng g c features/properties/property-details --style=scss
+
+# Gold
+ng g c features/gold/gold-list --style=scss
+ng g c features/gold/gold-details --style=scss
+
+# Cash
+ng g c features/cash/cash-list --style=scss
+ng g c features/cash/cash-details --style=scss
+
+# Shared components
+ng g c shared/components/summary-card --style=scss
+ng g c shared/components/asset-card --style=scss
+
+# Services
+ng g s core/services/asset
+
+# Models
+mkdir -p src/app/core/models
+touch src/app/core/models/asset.model.ts
+=========================================================================================
+asset.model.ts
+
+export type Country = 'india' | 'usa';
+export type AssetType = 'property' | 'gold' | 'cash';
+
+export interface Property {
+  id: number;
+  name: string;
+  location: string;
+  value: number;
+  image: string;
+  country: Country;
+}
+
+export interface Gold {
+  country: Country;
+  grams: number;
+  karat: string;
+  value: number;
+}
+
+export interface Cash {
+  country: Country;
+  checking: number;
+  savings: number;
+}
+
+export interface CountryAssets {
+  country: Country;
+  properties: Property[];
+  gold: Gold;
+  cash: Cash;
+}
+=========================================================================================
+asset.service.ts
+
+import { Injectable, signal } from '@angular/core';
+import {
+  Cash,
+  CountryAssets,
+  Gold,
+  Property
+} from '../models/asset.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AssetService {
+
+  private readonly _properties = signal<Property[]>([
+    {
+      id: 1,
+      name: 'Alluru',
+      location: 'India',
+      value: 150000,
+      image: 'assets/images/alluru.jpg',
+      country: 'india'
+    },
+    {
+      id: 2,
+      name: 'Jangreddigudem',
+      location: 'India',
+      value: 120000,
+      image: 'assets/images/jangreddigudem.jpg',
+      country: 'india'
+    },
+    {
+      id: 3,
+      name: 'Hyderabad',
+      location: 'Telangana, India',
+      value: 175000,
+      image: 'assets/images/hyderabad.jpg',
+      country: 'india'
+    },
+    {
+      id: 4,
+      name: 'Royal Ct',
+      location: 'New York, USA',
+      value: 833000,
+      image: 'assets/images/royal-ct.jpg',
+      country: 'usa'
+    },
+    {
+      id: 5,
+      name: 'Chaucer Place',
+      location: 'New York, USA',
+      value: 250000,
+      image: 'assets/images/chaucer-place.jpg',
+      country: 'usa'
+    }
+  ]);
+
+  private readonly _gold = signal<Gold[]>([
+    {
+      country: 'india',
+      grams: 245,
+      karat: '22K',
+      value: 25000
+    },
+    {
+      country: 'usa',
+      grams: 93.3,
+      karat: '24K',
+      value: 9500
+    }
+  ]);
+
+  private readonly _cash = signal<Cash[]>([
+    {
+      country: 'india',
+      checking: 7000,
+      savings: 11500
+    },
+    {
+      country: 'usa',
+      checking: 15000,
+      savings: 35000
+    }
+  ]);
+
+  properties = this._properties.asReadonly();
+  gold = this._gold.asReadonly();
+  cash = this._cash.asReadonly();
+
+  getProperties(country: 'india' | 'usa') {
+    return this._properties()
+      .filter(property => property.country === country);
+  }
+
+  getProperty(id: number) {
+    return this._properties()
+      .find(property => property.id === id);
+  }
+
+  getGold(country: 'india' | 'usa') {
+    return this._gold()
+      .find(gold => gold.country === country);
+  }
+
+  getCash(country: 'india' | 'usa') {
+    return this._cash()
+      .find(cash => cash.country === country);
+  }
+}
+
+=========================================================================================
+app.routes.ts
+
+
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+
+  {
+    path: '',
+    redirectTo: 'dashboard',
+    pathMatch: 'full'
+  },
+
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.component')
+        .then(m => m.DashboardComponent)
+  },
+
+  {
+    path: 'assets/:country/properties',
+    loadComponent: () =>
+      import('./features/properties/property-list/property-list.component')
+        .then(m => m.PropertyListComponent)
+  },
+
+  {
+    path: 'assets/:country/properties/:id',
+    loadComponent: () =>
+      import('./features/properties/property-details/property-details.component')
+        .then(m => m.PropertyDetailsComponent)
+  },
+
+  {
+    path: 'assets/:country/gold',
+    loadComponent: () =>
+      import('./features/gold/gold-list/gold-list.component')
+        .then(m => m.GoldListComponent)
+  },
+
+  {
+    path: 'assets/:country/cash',
+    loadComponent: () =>
+      import('./features/cash/cash-list/cash-list.component')
+        .then(m => m.CashListComponent)
+  },
+
+  {
+    path: '**',
+    redirectTo: 'dashboard'
+  }
+];
+
+
+=========================================================================================
+
+dashboard.component.ts
+
+
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject
+} from '@angular/core';
+
+import { CurrencyPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { AssetService } from '../../core/services/asset.service';
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+
+  imports: [
+    CurrencyPipe,
+    RouterLink
+  ],
+
+  templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.scss',
+
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class DashboardComponent {
+
+  private readonly assetService = inject(AssetService);
+
+  readonly properties = this.assetService.properties;
+  readonly gold = this.assetService.gold;
+  readonly cash = this.assetService.cash;
+
+  readonly indiaProperties = computed(() =>
+    this.properties().filter(p => p.country === 'india')
+  );
+
+  readonly usaProperties = computed(() =>
+    this.properties().filter(p => p.country === 'usa')
+  );
+
+  readonly propertyTotal = computed(() =>
+    this.properties().reduce(
+      (total, property) => total + property.value,
+      0
+    )
+  );
+
+  readonly goldTotal = computed(() =>
+    this.gold().reduce(
+      (total, gold) => total + gold.value,
+      0
+    )
+  );
+
+  readonly cashTotal = computed(() =>
+    this.cash().reduce(
+      (total, cash) =>
+        total + cash.checking + cash.savings,
+      0
+    )
+  );
+
+  readonly netWorth = computed(() =>
+    this.propertyTotal()
+    + this.goldTotal()
+    + this.cashTotal()
+  );
+
+  getGold(country: 'india' | 'usa') {
+    return this.assetService.getGold(country);
+  }
+
+  getCash(country: 'india' | 'usa') {
+    return this.assetService.getCash(country);
+  }
+}
+
+=========================================================================================
+dashboard.component.html
+<div class="dashboard">
+
+  <header class="topbar">
+
+    <div class="brand">
+      <div class="logo">$</div>
+
+      <div>
+        <h2>Money Management</h2>
+        <span>Personal Finance Dashboard</span>
+      </div>
+    </div>
+
+    <nav>
+      <a routerLink="/dashboard"
+         routerLinkActive="active">
+        Dashboard
+      </a>
+
+      <a routerLink="/assets/india/properties">
+        Properties
+      </a>
+
+      <a routerLink="/assets/india/gold">
+        Gold
+      </a>
+
+      <a routerLink="/assets/india/cash">
+        Cash
+      </a>
+    </nav>
+
+  </header>
+
+
+  <main class="content">
+
+    <section class="welcome">
+
+      <div>
+        <h1>Welcome back 👋</h1>
+        <p>
+          Here's an overview of your assets
+          across India and USA.
+        </p>
+      </div>
+
+      <div class="country-filter">
+        <button class="active">All</button>
+        <button>India</button>
+        <button>USA</button>
+      </div>
+
+    </section>
+
+
+    <!-- TOP SUMMARY -->
+
+    <section class="summary-grid">
+
+      <article class="summary-card property-summary">
+        <div class="summary-icon">⌂</div>
+
+        <div>
+          <span>Total Property Value</span>
+          <h2>
+            {{ propertyTotal() | currency:'USD' }}
+          </h2>
+          <small>
+            {{ properties().length }} properties
+          </small>
+        </div>
+      </article>
+
+
+      <article class="summary-card gold-summary">
+        <div class="summary-icon">◆</div>
+
+        <div>
+          <span>Gold Value</span>
+          <h2>
+            {{ goldTotal() | currency:'USD' }}
+          </h2>
+          <small>
+            India + USA
+          </small>
+        </div>
+      </article>
+
+
+      <article class="summary-card cash-summary">
+        <div class="summary-icon">$</div>
+
+        <div>
+          <span>Total Cash</span>
+          <h2>
+            {{ cashTotal() | currency:'USD' }}
+          </h2>
+          <small>
+            Checking + Savings
+          </small>
+        </div>
+      </article>
+
+
+      <article class="summary-card networth-summary">
+        <div class="summary-icon">↗</div>
+
+        <div>
+          <span>Estimated Net Worth</span>
+          <h2>
+            {{ netWorth() | currency:'USD' }}
+          </h2>
+          <small>All assets</small>
+        </div>
+      </article>
+
+    </section>
+
+
+    <!-- INDIA / USA -->
+
+    <section class="countries-grid">
+
+      <!-- INDIA -->
+
+      <article class="country-card">
+
+        <div class="country-header">
+          <div>
+            <span class="flag">🇮🇳</span>
+            <div>
+              <h2>India</h2>
+              <p>Your assets in India</p>
+            </div>
+          </div>
+
+          <button>View All →</button>
+        </div>
+
+
+        <div class="section-title">
+          <h3>Properties</h3>
+
+          <a routerLink="/assets/india/properties">
+            View all
+          </a>
+        </div>
+
+
+        <div class="properties">
+
+          @for (property of indiaProperties(); track property.id) {
+
+            <a
+              class="property-card"
+              [routerLink]="[
+                '/assets',
+                'india',
+                'properties',
+                property.id
+              ]">
+
+              <img
+                [src]="property.image"
+                [alt]="property.name">
+
+              <div>
+                <strong>{{ property.name }}</strong>
+                <span>{{ property.location }}</span>
+
+                <b>
+                  {{ property.value | currency:'USD' }}
+                </b>
+              </div>
+
+            </a>
+
+          }
+
+        </div>
+
+
+        <div class="asset-row">
+
+          <a
+            class="mini-card gold"
+            routerLink="/assets/india/gold">
+
+            <span class="mini-icon">◆</span>
+
+            <div>
+              <small>Gold</small>
+
+              <strong>
+                {{ getGold('india')?.grams }} g
+              </strong>
+
+              <span>
+                {{ getGold('india')?.value | currency:'USD' }}
+              </span>
+            </div>
+
+          </a>
+
+
+          <a
+            class="mini-card cash"
+            routerLink="/assets/india/cash">
+
+            <span class="mini-icon">$</span>
+
+            <div>
+              <small>Cash</small>
+
+              <strong>
+                {{
+                  (getCash('india')?.checking ?? 0)
+                  +
+                  (getCash('india')?.savings ?? 0)
+                  | currency:'USD'
+                }}
+              </strong>
+
+              <span>Checking + Savings</span>
+            </div>
+
+          </a>
+
+        </div>
+
+      </article>
+
+
+      <!-- USA -->
+
+      <article class="country-card">
+
+        <div class="country-header">
+
+          <div>
+            <span class="flag">🇺🇸</span>
+
+            <div>
+              <h2>USA</h2>
+              <p>Your assets in USA</p>
+            </div>
+          </div>
+
+          <button>View All →</button>
+
+        </div>
+
+
+        <div class="section-title">
+
+          <h3>Properties</h3>
+
+          <a routerLink="/assets/usa/properties">
+            View all
+          </a>
+
+        </div>
+
+
+        <div class="properties">
+
+          @for (property of usaProperties(); track property.id) {
+
+            <a
+              class="property-card"
+              [routerLink]="[
+                '/assets',
+                'usa',
+                'properties',
+                property.id
+              ]">
+
+              <img
+                [src]="property.image"
+                [alt]="property.name">
+
+              <div>
+                <strong>{{ property.name }}</strong>
+
+                <span>{{ property.location }}</span>
+
+                <b>
+                  {{ property.value | currency:'USD' }}
+                </b>
+              </div>
+
+            </a>
+
+          }
+
+        </div>
+
+
+        <div class="asset-row">
+
+          <a
+            class="mini-card gold"
+            routerLink="/assets/usa/gold">
+
+            <span class="mini-icon">◆</span>
+
+            <div>
+              <small>Gold</small>
+
+              <strong>
+                {{ getGold('usa')?.grams }} g
+              </strong>
+
+              <span>
+                {{ getGold('usa')?.value | currency:'USD' }}
+              </span>
+            </div>
+
+          </a>
+
+
+          <a
+            class="mini-card cash"
+            routerLink="/assets/usa/cash">
+
+            <span class="mini-icon">$</span>
+
+            <div>
+              <small>Cash</small>
+
+              <strong>
+                {{
+                  (getCash('usa')?.checking ?? 0)
+                  +
+                  (getCash('usa')?.savings ?? 0)
+                  | currency:'USD'
+                }}
+              </strong>
+
+              <span>Checking + Savings</span>
+            </div>
+
+          </a>
+
+        </div>
+
+      </article>
+
+    </section>
+
+  </main>
+
+</div>
+
+=========================================================================================
+dashboard.component.scss
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #f5f7fb;
+  color: #182235;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.dashboard {
+  min-height: 100vh;
+}
+
+.topbar {
+  min-height: 74px;
+  padding: 0 5%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #071a33;
+  color: #fff;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .logo {
+    width: 40px;
+    height: 40px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+    background: #fff;
+    color: #071a33;
+
+    font-weight: 800;
+    font-size: 20px;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+
+  span {
+    color: #aebbd0;
+    font-size: 11px;
+  }
+}
+
+nav {
+  display: flex;
+  gap: 30px;
+
+  a {
+    color: #c8d2e1;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 28px 0 24px;
+    border-bottom: 3px solid transparent;
+
+    &:hover,
+    &.active {
+      color: #fff;
+      border-color: #fff;
+    }
+  }
+}
+
+.content {
+  width: min(1450px, 92%);
+  margin: auto;
+  padding: 32px 0 50px;
+}
+
+.welcome {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 28px;
+
+  h1 {
+    margin: 0 0 6px;
+    font-size: 26px;
+  }
+
+  p {
+    margin: 0;
+    color: #7b8799;
+  }
+}
+
+.country-filter {
+  padding: 4px;
+  border-radius: 10px;
+  background: #e8edf4;
+
+  button {
+    border: 0;
+    background: transparent;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+
+    &.active {
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+    }
+  }
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+
+  margin-bottom: 28px;
+}
+
+.summary-card {
+  min-height: 125px;
+  padding: 22px;
+
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #e5e9f0;
+
+  box-shadow: 0 4px 15px rgba(26, 42, 68, .04);
+
+  span {
+    font-size: 13px;
+    color: #69768a;
+  }
+
+  h2 {
+    margin: 7px 0 4px;
+    font-size: 23px;
+  }
+
+  small {
+    color: #8792a5;
+  }
+}
+
+.summary-icon {
+  width: 50px;
+  height: 50px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 12px;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.property-summary .summary-icon {
+  background: #e7f0ff;
+  color: #2469c9;
+}
+
+.gold-summary .summary-icon {
+  background: #fff4cc;
+  color: #d89c00;
+}
+
+.cash-summary .summary-icon {
+  background: #dff8ed;
+  color: #16885c;
+}
+
+.networth-summary .summary-icon {
+  background: #ede7ff;
+  color: #6949c8;
+}
+
+.countries-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.country-card {
+  padding: 24px;
+
+  background: #fff;
+  border: 1px solid #e2e7ee;
+  border-radius: 15px;
+
+  box-shadow: 0 4px 18px rgba(29, 43, 65, .04);
+}
+
+.country-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+
+  border-bottom: 1px solid #edf0f4;
+
+  > div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  h2 {
+    margin: 0 0 3px;
+    font-size: 20px;
+  }
+
+  p {
+    margin: 0;
+    color: #8994a5;
+    font-size: 12px;
+  }
+
+  button {
+    border: 0;
+    background: transparent;
+    color: #2666b2;
+    cursor: pointer;
+    font-weight: 600;
+  }
+}
+
+.flag {
+  font-size: 28px;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 13px;
+
+  h3 {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  a {
+    text-decoration: none;
+    color: #3472c6;
+    font-size: 12px;
+  }
+}
+
+.properties {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+
+  margin-bottom: 18px;
+}
+
+.property-card {
+  overflow: hidden;
+
+  display: block;
+
+  color: inherit;
+  text-decoration: none;
+
+  border: 1px solid #e3e7ed;
+  border-radius: 11px;
+  background: #fff;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(23, 37, 61, .1);
+  }
+
+  img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+  }
+
+  div {
+    padding: 11px;
+  }
+
+  strong,
+  span,
+  b {
+    display: block;
+  }
+
+  strong {
+    font-size: 13px;
+  }
+
+  span {
+    margin: 3px 0 8px;
+    font-size: 10px;
+    color: #8b96a7;
+  }
+
+  b {
+    font-size: 13px;
+  }
+}
+
+.asset-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mini-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 16px;
+
+  border-radius: 11px;
+  text-decoration: none;
+  color: inherit;
+
+  transition: transform .2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &.gold {
+    background: #fff8df;
+    border: 1px solid #f6df8b;
+  }
+
+  &.cash {
+    background: #eaf9f2;
+    border: 1px solid #bdebd7;
+  }
+
+  small,
+  strong,
+  span {
+    display: block;
+  }
+
+  small {
+    color: #667284;
+  }
+
+  strong {
+    margin: 3px 0;
+    font-size: 16px;
+  }
+
+  span {
+    font-size: 11px;
+    color: #798598;
+  }
+}
+
+.mini-icon {
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  background: rgba(255, 255, 255, .8);
+  border-radius: 50%;
+
+  font-weight: 800;
+}
+
+/* Tablet */
+
+@media (max-width: 1100px) {
+
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .countries-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 650px) {
+
+  .topbar {
+    padding: 15px 20px;
+  }
+
+  nav {
+    display: none;
+  }
+
+  .welcome {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .properties {
+    grid-template-columns: 1fr;
+  }
+
+  .asset-row {
+    grid-template-columns: 1fr;
+  }
+
+  .content {
+    width: 94%;
+  }
+}
+=========================================================================================
+app.component.html
+
+<router-outlet />
+=========================================================================================
+app.component.ts
+
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+
+@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss'
+})
+export class AppComponent {}
+
+=========================================================================================
+
+
+
