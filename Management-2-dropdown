@@ -582,10 +582,139 @@ india.component.scss
 
 
 =====================================================================
+UsaComponent.ts
+
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+@Component({
+  selector: 'app-usa',
+  standalone: true,
+  imports: [RouterLink],
+  templateUrl: './usa.component.html',
+  styleUrl: './usa.component.scss'
+})
+export class UsaComponent {
+
+}
 
 
+=====================================================================
+
+<div class="asset-page">
+
+  <div class="page-header">
+
+    <div class="country-title">
+
+      <span class="flag">
+        🇺🇸
+      </span>
+
+      <div>
+        <h1>USA Assets</h1>
+        <p>Manage all your assets in USA</p>
+      </div>
+
+    </div>
+
+  </div>
 
 
+  <div class="asset-grid">
+
+    <a
+      routerLink="/usa/houses"
+      class="asset-card house">
+
+      <div class="icon">
+        🏠
+      </div>
+
+      <div>
+        <h2>Houses</h2>
+
+        <p>
+          View and manage your USA properties
+        </p>
+
+        <span>
+          View Houses →
+        </span>
+      </div>
+
+    </a>
+
+
+    <a
+      routerLink="/usa/cash"
+      class="asset-card cash">
+
+      <div class="icon">
+        $
+      </div>
+
+      <div>
+        <h2>Cash</h2>
+
+        <p>
+          Checking, savings and cash balances
+        </p>
+
+        <span>
+          View Cash →
+        </span>
+      </div>
+
+    </a>
+
+
+    <a
+      routerLink="/usa/stocks"
+      class="asset-card stocks">
+
+      <div class="icon">
+        📈
+      </div>
+
+      <div>
+        <h2>Stocks</h2>
+
+        <p>
+          Track stocks and investment accounts
+        </p>
+
+        <span>
+          View Stocks →
+        </span>
+      </div>
+
+    </a>
+
+  </div>
+
+</div>
+=====================================================================
+india.scss
+.stocks .icon {
+  background: #eee9ff;
+  color: #6847c7;
+}
+=====================================================================
+
+                    ┌───────────────┐
+                    │    Assets ▼   │
+                    └───────┬───────┘
+                            │
+                ┌───────────┴───────────┐
+                ↓                       ↓
+          🇮🇳 INDIA                 🇺🇸 USA
+                │                       │
+      ┌─────────┼─────────┐       ┌─────┼─────┐
+      ↓         ↓         ↓       ↓     ↓     ↓
+   Houses     Lands     Gold    Houses Cash Stocks
+                          ↓
+                        Cash
 =====================================================================
 
 
