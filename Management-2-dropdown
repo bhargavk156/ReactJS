@@ -1,0 +1,592 @@
+Dashboard
+
+Assets ▼
+   ├── 🇮🇳 India
+   └── 🇺🇸 USA
+
+🇮🇳 India Assets
+
+┌─────────────┐ ┌─────────────┐
+│ 🏠 Houses   │ │ 🌳 Lands    │
+│ View Houses │ │ View Lands  │
+└─────────────┘ └─────────────┘
+
+┌─────────────┐ ┌─────────────┐
+│ 🪙 Gold     │ │ 💵 Cash     │
+│ View Gold   │ │ View Cash   │
+└─────────────┘ └─────────────┘
+
+🇺🇸 USA Assets
+
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│ 🏠 Houses   │ │ 💵 Cash     │ │ 📈 Stocks   │
+│ View Houses │ │ View Cash   │ │ View Stocks │
+└─────────────┘ └─────────────┘
+=====================================================================
+1. Routes
+
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+
+  {
+    path: '',
+    redirectTo: 'dashboard',
+    pathMatch: 'full'
+  },
+
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.component')
+        .then(m => m.DashboardComponent)
+  },
+
+  // ==========================
+  // INDIA
+  // ==========================
+
+  {
+    path: 'india',
+    loadComponent: () =>
+      import('./features/india/india.component')
+        .then(m => m.IndiaComponent)
+  },
+
+  {
+    path: 'india/houses',
+    loadComponent: () =>
+      import('./features/india/houses/houses.component')
+        .then(m => m.HousesComponent)
+  },
+
+  {
+    path: 'india/lands',
+    loadComponent: () =>
+      import('./features/india/lands/lands.component')
+        .then(m => m.LandsComponent)
+  },
+
+  {
+    path: 'india/gold',
+    loadComponent: () =>
+      import('./features/india/gold/gold.component')
+        .then(m => m.GoldComponent)
+  },
+
+  {
+    path: 'india/cash',
+    loadComponent: () =>
+      import('./features/india/cash/cash.component')
+        .then(m => m.CashComponent)
+  },
+
+  // ==========================
+  // USA
+  // ==========================
+
+  {
+    path: 'usa',
+    loadComponent: () =>
+      import('./features/usa/usa.component')
+        .then(m => m.UsaComponent)
+  },
+
+  {
+    path: 'usa/houses',
+    loadComponent: () =>
+      import('./features/usa/houses/houses.component')
+        .then(m => m.HousesComponent)
+  },
+
+  {
+    path: 'usa/cash',
+    loadComponent: () =>
+      import('./features/usa/cash/cash.component')
+        .then(m => m.CashComponent)
+  },
+
+  {
+    path: 'usa/stocks',
+    loadComponent: () =>
+      import('./features/usa/stocks/stocks.component')
+        .then(m => m.StocksComponent)
+  },
+
+  {
+    path: '**',
+    redirectTo: 'dashboard'
+  }
+
+];
+
+=====================================================================
+Generate components
+ng g c features/india
+ng g c features/india/houses
+ng g c features/india/lands
+ng g c features/india/gold
+ng g c features/india/cash
+
+ng g c features/usa
+ng g c features/usa/houses
+ng g c features/usa/cash
+ng g c features/usa/stocks
+features/
+│
+├── dashboard/
+│
+├── india/
+│   ├── india.component.ts
+│   ├── india.component.html
+│   ├── india.component.scss
+│   │
+│   ├── houses/
+│   ├── lands/
+│   ├── gold/
+│   └── cash/
+│
+└── usa/
+    ├── usa.component.ts
+    ├── usa.component.html
+    ├── usa.component.scss
+    │
+    ├── houses/
+    ├── cash/
+    └── stocks/
+=====================================================================
+3. Navbar dropdown
+<nav>
+
+  <a
+    routerLink="/dashboard"
+    routerLinkActive="active">
+    Dashboard
+  </a>
+
+  <div class="nav-dropdown">
+
+    <button class="dropdown-button">
+      Assets
+      <span>⌄</span>
+    </button>
+
+    <div class="dropdown-menu">
+
+      <a routerLink="/india">
+        <span>🇮🇳</span>
+
+        <div>
+          <strong>India</strong>
+          <small>Houses, Lands, Gold & Cash</small>
+        </div>
+      </a>
+
+      <a routerLink="/usa">
+        <span>🇺🇸</span>
+
+        <div>
+          <strong>USA</strong>
+          <small>Houses, Cash & Stocks</small>
+        </div>
+      </a>
+
+    </div>
+
+  </div>
+
+</nav>
+=====================================================================
+Add to your navbar SCSS:
+nav {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+
+  > a {
+    color: #c8d2e1;
+    text-decoration: none;
+    padding: 28px 0 24px;
+    border-bottom: 3px solid transparent;
+
+    &:hover,
+    &.active {
+      color: white;
+      border-color: white;
+    }
+  }
+}
+
+.nav-dropdown {
+  position: relative;
+  height: 74px;
+
+  display: flex;
+  align-items: center;
+
+  &:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-button {
+  border: 0;
+  background: transparent;
+  color: #c8d2e1;
+
+  font-size: 14px;
+  cursor: pointer;
+
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.dropdown-menu {
+  position: absolute;
+
+  top: 68px;
+  right: 0;
+
+  width: 290px;
+
+  padding: 8px;
+
+  background: white;
+
+  border: 1px solid #e4e9f0;
+  border-radius: 12px;
+
+  box-shadow: 0 15px 40px rgba(0, 0, 0, .15);
+
+  opacity: 0;
+  visibility: hidden;
+
+  transform: translateY(-8px);
+
+  transition: all .2s ease;
+
+  z-index: 1000;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    padding: 14px;
+
+    border-radius: 9px;
+
+    color: #17243a;
+    text-decoration: none;
+
+    &:hover {
+      background: #f3f6fa;
+    }
+
+    > span {
+      font-size: 27px;
+    }
+  }
+
+  strong,
+  small {
+    display: block;
+  }
+
+  strong {
+    margin-bottom: 3px;
+    font-size: 14px;
+  }
+
+  small {
+    color: #8591a3;
+    font-size: 11px;
+  }
+}
+
+
+=====================================================================
+4. India page
+india.component.ts
+
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+@Component({
+  selector: 'app-india',
+  standalone: true,
+  imports: [RouterLink],
+  templateUrl: './india.component.html',
+  styleUrl: './india.component.scss'
+})
+export class IndiaComponent {
+
+}
+=====================================================================
+india.component.html
+<div class="asset-page">
+
+  <div class="page-header">
+
+    <div class="country-title">
+      <span class="flag">🇮🇳</span>
+
+      <div>
+        <h1>India Assets</h1>
+        <p>Manage all your assets in India</p>
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="asset-grid">
+
+    <!-- HOUSE -->
+
+    <a
+      routerLink="/india/houses"
+      class="asset-card house">
+
+      <div class="icon">
+        🏠
+      </div>
+
+      <div>
+        <h2>Houses</h2>
+        <p>
+          View and manage your houses
+        </p>
+
+        <span>
+          View Houses →
+        </span>
+      </div>
+
+    </a>
+
+
+    <!-- LAND -->
+
+    <a
+      routerLink="/india/lands"
+      class="asset-card land">
+
+      <div class="icon">
+        🌳
+      </div>
+
+      <div>
+        <h2>Lands</h2>
+
+        <p>
+          View and manage your land properties
+        </p>
+
+        <span>
+          View Lands →
+        </span>
+      </div>
+
+    </a>
+
+
+    <!-- GOLD -->
+
+    <a
+      routerLink="/india/gold"
+      class="asset-card gold">
+
+      <div class="icon">
+        ◆
+      </div>
+
+      <div>
+        <h2>Gold</h2>
+
+        <p>
+          Track gold weight and value
+        </p>
+
+        <span>
+          View Gold →
+        </span>
+      </div>
+
+    </a>
+
+
+    <!-- CASH -->
+
+    <a
+      routerLink="/india/cash"
+      class="asset-card cash">
+
+      <div class="icon">
+        $
+      </div>
+
+      <div>
+        <h2>Cash</h2>
+
+        <p>
+          Bank accounts and cash balances
+        </p>
+
+        <span>
+          View Cash →
+        </span>
+      </div>
+
+    </a>
+
+  </div>
+
+</div>
+=====================================================================
+india.component.scss
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+.asset-page {
+  width: min(1200px, 92%);
+  margin: auto;
+  padding: 45px 0;
+}
+
+.page-header {
+  margin-bottom: 35px;
+}
+
+.country-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  .flag {
+    font-size: 42px;
+  }
+
+  h1 {
+    margin: 0 0 5px;
+    font-size: 28px;
+    color: #152238;
+  }
+
+  p {
+    margin: 0;
+    color: #7b8798;
+  }
+}
+
+.asset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+
+.asset-card {
+  min-height: 190px;
+
+  display: flex;
+  align-items: center;
+  gap: 24px;
+
+  padding: 30px;
+
+  border-radius: 16px;
+  border: 1px solid #e2e7ee;
+
+  background: white;
+
+  text-decoration: none;
+  color: #17243a;
+
+  box-shadow: 0 5px 20px rgba(25, 42, 70, .05);
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+      0 15px 35px rgba(25, 42, 70, .12);
+  }
+
+  .icon {
+    width: 75px;
+    height: 75px;
+
+    flex-shrink: 0;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 16px;
+
+    font-size: 34px;
+    font-weight: 800;
+  }
+
+  h2 {
+    margin: 0 0 7px;
+    font-size: 21px;
+  }
+
+  p {
+    margin: 0 0 18px;
+    color: #7d899a;
+    font-size: 13px;
+  }
+
+  span {
+    color: #2867b2;
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+
+.house .icon {
+  background: #e8f1ff;
+}
+
+.land .icon {
+  background: #e8f8ed;
+}
+
+.gold .icon {
+  background: #fff5d5;
+  color: #d79c00;
+}
+
+.cash .icon {
+  background: #e5f8ef;
+  color: #16885c;
+}
+
+@media (max-width: 750px) {
+
+  .asset-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+=====================================================================
+
+
+
+
+=====================================================================
+
+
+
