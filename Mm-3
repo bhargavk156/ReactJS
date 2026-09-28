@@ -1,0 +1,596 @@
+export type Country = 'usa' | 'india';
+
+export interface House {
+
+  id: number;
+
+  country: Country;
+
+  propertyName: string;
+
+  propertyNumber?: string;
+
+  address: string;
+
+  city: string;
+
+  state: string;
+
+  zipCode: string;
+
+  purchaseDate: string;
+
+  purchasePrice: number;
+
+  currentValue: number;
+
+  mortgageBalance: number;
+
+  monthlyPayment: number;
+
+  interestRate: number;
+
+  mortgageType?: string;
+
+  lender?: string;
+
+  loanTermYears?: number;
+
+  propertyTax?: number;
+
+  insurance?: number;
+
+  hoa?: number;
+
+  squareFeet?: number;
+
+  bedrooms?: number;
+
+  bathrooms?: number;
+
+  notes?: string;
+
+  documents: PropertyDocument[];
+}
+
+export interface PropertyDocument {
+
+  id: number;
+
+  name: string;
+
+  type: string;
+
+  url?: string;
+}
+-------
+
+readonly houseForm = this.fb.nonNullable.group({
+
+  propertyName: ['', Validators.required],
+
+  propertyNumber: [''],
+
+  address: ['', Validators.required],
+
+  city: ['', Validators.required],
+
+  state: ['', Validators.required],
+
+  zipCode: ['', Validators.required],
+
+  purchaseDate: ['', Validators.required],
+
+  purchasePrice: [
+    0,
+    [Validators.required, Validators.min(0)]
+  ],
+
+  currentValue: [
+    0,
+    [Validators.required, Validators.min(0)]
+  ],
+
+  mortgageBalance: [0],
+
+  monthlyPayment: [0],
+
+  interestRate: [0],
+
+  mortgageType: [''],
+
+  lender: [''],
+
+  loanTermYears: [30],
+
+  propertyTax: [0],
+
+  insurance: [0],
+
+  hoa: [0],
+
+  squareFeet: [0],
+
+  bedrooms: [0],
+
+  bathrooms: [0],
+
+  notes: ['']
+
+});
+------
+USA / Houses / Add House
+
+Add House
+
+PROPERTY INFORMATION
+------------------------------------------------
+
+Property Name *
+[ Royal Ct                         ]
+
+Property Number
+[ ______________________________ ]
+
+Street Address *
+[ ______________________________ ]
+
+City *                 State *          ZIP
+[ _____________ ]      [ NY ]           [ ______ ]
+
+
+PURCHASE INFORMATION
+------------------------------------------------
+
+Purchase Date           Purchase Price
+[ 10/10/2025 ]          [ $800,000 ]
+
+Current Value
+[ $833,000 ]
+
+
+MORTGAGE
+------------------------------------------------
+
+Lender                   Mortgage Type
+[ _____________ ]        [ 5/1 ARM ▼ ]
+
+Original Loan            Remaining Mortgage
+[ $____________ ]        [ $____________ ]
+
+Interest Rate            Loan Term
+[ 5.25 % ]               [ 30 years ]
+
+Monthly Payment
+[ $5,500 ]
+
+
+PROPERTY EXPENSES
+------------------------------------------------
+
+Property Tax             Insurance
+[ $________ ]            [ $________ ]
+
+HOA
+[ $________ ]
+
+
+PROPERTY DETAILS
+------------------------------------------------
+
+Square Feet       Bedrooms       Bathrooms
+[ 2343 ]          [ 4 ]          [ 3 ]
+
+
+DOCUMENTS
+------------------------------------------------
+
+Purchase Agreement     [ Upload ]
+Mortgage Document      [ Upload ]
+Closing Disclosure     [ Upload ]
+Property Tax           [ Upload ]
+Insurance              [ Upload ]
+
+                     [ Cancel ] [ Save House ]
+------
+
+USA / Banking & Cash
+
+Banking & Cash                             + Add Account
+
+Cash Available
+$50,000
+
+Credit Card Balance
+$12,400
+
+Total Credit Limit
+$65,000
+
+
+BANK ACCOUNTS
+
+Bank           Type       Balance       Account       Actions
+----------------------------------------------------------------
+Chase          Checking   $12,000       •••• 1234     Edit
+Wells Fargo    Savings    $25,000       •••• 7788     Edit
+
+
+CREDIT CARDS
+
+Bank          Card       Limit      Balance    Available    Due       Actions
+-----------------------------------------------------------------------------
+Amex          Gold       $20,000    $0         $20,000      --        Edit
+Citi          Card       $15,000    $5,786     $9,214       05/01     Edit
+BofA          Card       $18,000    $4,600     $13,400      11/26     Edit
+------
+
+export type AccountType =
+  | 'checking'
+  | 'savings'
+  | 'cash'
+  | 'credit-card';
+
+export interface FinancialAccount {
+
+  id: number;
+
+  country: 'usa' | 'india';
+
+  bankName: string;
+
+  accountName: string;
+
+  accountType: AccountType;
+
+  lastFourDigits?: string;
+
+  balance: number;
+
+  currency: 'USD' | 'INR';
+
+  // Credit card fields
+
+  creditLimit?: number;
+
+  currentBalance?: number;
+
+  availableCredit?: number;
+
+  minimumPayment?: number;
+
+  paymentDueDate?: string;
+
+  interestRate?: number;
+
+  statementBalance?: number;
+
+  notes?: string;
+}
+
+------
+
+Account Type
+
+○ Checking
+○ Savings
+○ Cash
+○ Credit Card
+------
+
+@if (form.controls.accountType.value === 'credit-card') {
+
+  <div class="form-section">
+
+    <h3>Credit Card Details</h3>
+
+    <!-- limit -->
+    <!-- balance -->
+    <!-- minimum payment -->
+    <!-- due date -->
+    <!-- APR -->
+
+  </div>
+
+}
+------
+
+USA / Gold
+
+Gold Portfolio                               + Add Gold
+
+Total Weight       Purchase Cost       Current Value
+325.50 grams       $24,500             $31,800
+
+
+Item             Type       Purity   Weight   Bought For  Current Value  Bill
+--------------------------------------------------------------------------------
+Gold Chain       Jewelry    22K      42g      $3,500      $4,100         📄
+Gold Coins       Coin       24K      100g     $8,000      $10,500        📄
+Gold Bracelet    Jewelry    22K      35g      $2,700      $3,300         📄
+
+----11
+export interface GoldItem {
+
+  id: number;
+
+  country: 'usa' | 'india';
+
+  itemName: string;
+
+  type:
+    | 'jewelry'
+    | 'coin'
+    | 'bar'
+    | 'other';
+
+  purity: '18K' | '22K' | '24K';
+
+  weightGrams: number;
+
+  purchaseDate: string;
+
+  purchasePrice: number;
+
+  currentValue: number;
+
+  purchasedFrom?: string;
+
+  billImage?: string;
+
+  itemImage?: string;
+
+  notes?: string;
+}
+-----11
+
+Gold Photo
+[ Choose Image ]
+
+Purchase Bill
+[ Choose Image ]
+-------1
+
+USA / Stocks
+
+Stock Portfolio                              + Add Stock
+
+Invested             Current Value        Gain/Loss
+$50,000              $62,500              +$12,500
+
+
+Symbol   Company       Shares   Avg Cost   Current Price   Value     Gain/Loss
+-----------------------------------------------------------------------------
+AAPL     Apple         50       $175       $225            $11,250   +$2,500
+
+NVDA     NVIDIA        25       $110       $185            $4,625    +$1,875
+
+------
+export interface Stock {
+
+  id: number;
+
+  country: 'usa' | 'india';
+
+  symbol: string;
+
+  companyName: string;
+
+  brokerage?: string;
+
+  quantity: number;
+
+  averagePurchasePrice: number;
+
+  currentPrice: number;
+
+  purchaseDate?: string;
+
+  notes?: string;
+}
+------
+
+currentValue =
+  quantity * currentPrice;
+
+investedAmount =
+  quantity * averagePurchasePrice;
+
+gainLoss =
+  currentValue - investedAmount;
+----
+
+UsaGoldComponent
+IndiaGoldComponent
+UsaHouseComponent
+IndiaHouseComponent
+----
+
+HouseListComponent
+HouseFormComponent
+
+GoldListComponent
+GoldFormComponent
+
+BankingListComponent
+BankingFormComponent
+
+StockListComponent
+StockFormComponent
+
+LandListComponent
+LandFormComponent
+----
+
+private readonly route = inject(ActivatedRoute);
+
+readonly country =
+  this.route.snapshot.paramMap.get('country');
+
+-----
+/assets/usa/houses
+-----
+
+export const routes: Routes = [
+
+  {
+    path: '',
+    redirectTo: 'dashboard',
+    pathMatch: 'full'
+  },
+
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.component')
+        .then(m => m.DashboardComponent)
+  },
+
+  {
+    path: 'assets/:country',
+    loadComponent: () =>
+      import('./features/assets/asset-home/asset-home.component')
+        .then(m => m.AssetHomeComponent)
+  },
+
+  // HOUSES
+
+  {
+    path: 'assets/:country/houses',
+    loadComponent: () =>
+      import('./features/houses/house-list/house-list.component')
+        .then(m => m.HouseListComponent)
+  },
+
+  {
+    path: 'assets/:country/houses/add',
+    loadComponent: () =>
+      import('./features/houses/house-form/house-form.component')
+        .then(m => m.HouseFormComponent)
+  },
+
+  {
+    path: 'assets/:country/houses/:id/edit',
+    loadComponent: () =>
+      import('./features/houses/house-form/house-form.component')
+        .then(m => m.HouseFormComponent)
+  },
+
+  // GOLD
+
+  {
+    path: 'assets/:country/gold',
+    loadComponent: () =>
+      import('./features/gold/gold-list/gold-list.component')
+        .then(m => m.GoldListComponent)
+  },
+
+  {
+    path: 'assets/:country/gold/add',
+    loadComponent: () =>
+      import('./features/gold/gold-form/gold-form.component')
+        .then(m => m.GoldFormComponent)
+  },
+
+  // BANKING
+
+  {
+    path: 'assets/:country/banking',
+    loadComponent: () =>
+      import('./features/banking/banking-list/banking-list.component')
+        .then(m => m.BankingListComponent)
+  },
+
+  {
+    path: 'assets/:country/banking/add',
+    loadComponent: () =>
+      import('./features/banking/banking-form/banking-form.component')
+        .then(m => m.BankingFormComponent)
+  },
+
+  // STOCKS
+
+  {
+    path: 'assets/:country/stocks',
+    loadComponent: () =>
+      import('./features/stocks/stock-list/stock-list.component')
+        .then(m => m.StockListComponent)
+  },
+
+  {
+    path: 'assets/:country/stocks/add',
+    loadComponent: () =>
+      import('./features/stocks/stock-form/stock-form.component')
+        .then(m => m.StockFormComponent)
+  }
+
+];
+
+Component
+     ↓
+Asset Service
+     ↓
+Repository / Data Service
+     ↓
+Mock data NOW
+     ↓
+Spring Boot REST API LATER
+     ↓
+PostgreSQL / Oracle
+
+getHouses(country: string) {
+  return this.mockHouses()
+    .filter(house => house.country === country);
+}
+getHouses(country: string) {
+
+  return this.http.get<House[]>(
+    `${this.apiUrl}/houses`,
+    {
+      params: { country }
+    }
+  );
+
+}
+features/
+
+assets/
+  asset-home/
+
+houses/
+  house-list/
+  house-form/
+  house-details/
+
+lands/
+  land-list/
+  land-form/
+  land-details/
+
+gold/
+  gold-list/
+  gold-form/
+  gold-details/
+
+banking/
+  banking-list/
+  banking-form/
+
+stocks/
+  stock-list/
+  stock-form/
+
+shared/
+  data-table/
+  page-header/
+  summary-card/
+  document-upload/
+  confirm-dialog/
+
+core/
+  models/
+  services/
+
+
+
+
